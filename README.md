@@ -1,4 +1,4 @@
-🎮 Project Overview
+#🎮 Project Overview
 This is a custom 3D voxel-based game engine and sandbox game, built to understand the fundamentals of:
 
 3D graphics programming and OpenGL
@@ -6,7 +6,7 @@ Procedural world generation
 Real-time physics simulation
 Game engine architecture
 
-✨ Planned Features
+#✨ Planned Features
 Core Gameplay
 
  3D first-person camera controls
@@ -16,7 +16,7 @@ Core Gameplay
  Infinite procedural world generation
  Inventory and crafting system
 
-Technical Features
+#Technical Features
 
  Chunk-based world loading (16x16x256 blocks)
  Perlin noise terrain generation
@@ -27,16 +27,7 @@ Technical Features
  Collision detection and physics
  Multi-threaded chunk generation
 
-Advanced Features
-
- Biome system (forests, deserts, mountains)
- Cave generation
- Weather system
- Day/night cycle
- Save/load world persistence
- Multiplayer support
-
-🌊 Water Physics System
+#🌊 Water Physics System
 The water system will feature realistic fluid dynamics:
 
 Sine wave displacement for surface animation
