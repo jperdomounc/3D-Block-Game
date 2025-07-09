@@ -1,0 +1,8 @@
+[
+{
+  "directory": "/Users/juanperdomo/Desktop/3Dgame/build",
+  "command": "/usr/bin/c++  -isystem /opt/homebrew/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -g -std=gnu++17 -arch arm64 -o CMakeFiles/3Dgame.dir/main.cpp.o -c /Users/juanperdomo/Desktop/3Dgame/main.cpp",
+  "file": "/Users/juanperdomo/Desktop/3Dgame/main.cpp",
+  "output": "CMakeFiles/3Dgame.dir/main.cpp.o"
+}
+]
