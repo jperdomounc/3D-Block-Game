@@ -38,16 +38,39 @@ Reflection and refraction shaders for visual realism
 
 Water will be rendered as a special transparent block type with vertex displacement using sine waves in the vertex shader, creating realistic wave motion.
 
-3Dgame/
-├── CMakeLists.txt
-├── main.cpp
-├── README.md
-├── PROJECT_STRUCTURE.md
-├── build/
-│   └── 3Dgame
-└── shaders/
-├── fragment.glsl
-└── vertex.glsl
+.vscode/
+    └── c_cpp_properties.json
+build/
+    ├── CMakeFiles/
+        ├── 3Dgame.dir/
+            ├── build.make
+            ├── cmake_clean.cmake
+            ├── compiler_depend.make
+            ├── compiler_depend.ts
+            ├── depend.make
+            ├── DependInfo.cmake
+            ├── flags.make
+            ├── link.txt
+            ├── main.cpp.o
+            ├── main.cpp.o.d
+            └── progress.make
+    ├── shaders/
+        ├── fragment.glsl
+        └── vertex.glsl
+    ├── 3Dgame
+    ├── cmake_install.cmake
+    ├── CMakeCache.txt
+    ├── compile_commands.json
+    └── Makefile
+shaders/
+    ├── fragment.glsl
+    └── vertex.glsl
+src/
+    ├── camera.cpp
+    └── shader.cpp
+CMakeLists.txt
+main.cpp
+README.md
 
 Stuff to add:
 Static Block Grid
