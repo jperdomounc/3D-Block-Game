@@ -1,4 +1,4 @@
-#🎮 Project Overview
+# 🎮 Project Overview
 This is a custom 3D voxel-based game engine and sandbox game, built to understand the fundamentals of:
 
 3D graphics programming and OpenGL
@@ -6,7 +6,7 @@ Procedural world generation
 Real-time physics simulation
 Game engine architecture
 
-#✨ Planned Features
+# ✨ Planned Features
 Core Gameplay
 
  3D first-person camera controls
@@ -16,7 +16,7 @@ Core Gameplay
  Infinite procedural world generation
  Inventory and crafting system
 
-#Technical Features
+# Technical Features
 
  Chunk-based world loading (16x16x256 blocks)
  Perlin noise terrain generation
@@ -38,6 +38,16 @@ Reflection and refraction shaders for visual realism
 
 Water will be rendered as a special transparent block type with vertex displacement using sine waves in the vertex shader, creating realistic wave motion.
 
+3Dgame/
+├── main.cpp                    # ✅ Main game loop, rendering, camera, shaders (all-in-one)
+├── CMakeLists.txt             # ✅ Build configuration for macOS
+├── shaders/                   # ✅ GLSL shader files
+│   ├── vertex.glsl            # ✅ Vertex transformations
+│   └── fragment.glsl          # ✅ Basic fragment coloring
+├── build/                     # ✅ Build output directory (auto-generated)
+│   ├── 3Dgame                 # ✅ Executable
+│   └── shaders/               # ✅ Copied shader files
+└── README.md                  # ✅ Project documentation
 
 Stuff to add:
 Static Block Grid
