@@ -38,6 +38,8 @@ Reflection and refraction shaders for visual realism
 
 Water will be rendered as a special transparent block type with vertex displacement using sine waves in the vertex shader, creating realistic wave motion.
 
+# File Tree
+```
 .vscode/
     └── c_cpp_properties.json
 build/
@@ -71,6 +73,7 @@ src/
 CMakeLists.txt
 main.cpp
 README.md
+```
 
 Stuff to add:
 Static Block Grid
