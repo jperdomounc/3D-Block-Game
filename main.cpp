@@ -7,6 +7,134 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <cmath>
+#include <random>
+#include <vector>
+
+enum class BlockType : uint8_t {
+    AIR = 0,
+    STONE = 1,
+    DIRT = 2,
+    GRASS = 3
+};
+
+const int WORLD_SIZE = 64;
+BlockType world[WORLD_SIZE][WORLD_SIZE][WORLD_SIZE];
+
+class PerlinNoise {
+private:
+    std::vector<int> permutation;
+    
+    double fade(double t) {
+        return t * t * t * (t * (t * 6 - 15) + 10);
+    }
+    
+    double lerp(double t, double a, double b) {
+        return a + t * (b - a);
+    }
+    
+    double grad(int hash, double x, double y, double z) {
+        int h = hash & 15;
+        double u = h < 8 ? x : y;
+        double v = h < 4 ? y : h == 12 || h == 14 ? x : z;
+        return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
+    }
+    
+public:
+    PerlinNoise(unsigned int seed = 0) {
+        permutation.resize(512);
+        
+        for (int i = 0; i < 256; i++) {
+            permutation[i] = i;
+        }
+        
+        std::default_random_engine engine(seed);
+        std::shuffle(permutation.begin(), permutation.begin() + 256, engine);
+        
+        for (int i = 0; i < 256; i++) {
+            permutation[256 + i] = permutation[i];
+        }
+    }
+    
+    double noise(double x, double y, double z) {
+        int X = (int)floor(x) & 255;
+        int Y = (int)floor(y) & 255;
+        int Z = (int)floor(z) & 255;
+        
+        x -= floor(x);
+        y -= floor(y);
+        z -= floor(z);
+        
+        double u = fade(x);
+        double v = fade(y);
+        double w = fade(z);
+        
+        int A = permutation[X] + Y;
+        int AA = permutation[A] + Z;
+        int AB = permutation[A + 1] + Z;
+        int B = permutation[X + 1] + Y;
+        int BA = permutation[B] + Z;
+        int BB = permutation[B + 1] + Z;
+        
+        return lerp(w, lerp(v, lerp(u, grad(permutation[AA], x, y, z),
+                                       grad(permutation[BA], x - 1, y, z)),
+                               lerp(u, grad(permutation[AB], x, y - 1, z),
+                                       grad(permutation[BB], x - 1, y - 1, z))),
+                       lerp(v, lerp(u, grad(permutation[AA + 1], x, y, z - 1),
+                                       grad(permutation[BA + 1], x - 1, y, z - 1)),
+                               lerp(u, grad(permutation[AB + 1], x, y - 1, z - 1),
+                                       grad(permutation[BB + 1], x - 1, y - 1, z - 1))));
+    }
+    
+    double octaveNoise(double x, double y, double z, int octaves, double persistence) {
+        double total = 0;
+        double frequency = 1;
+        double amplitude = 1;
+        double maxValue = 0;
+        
+        for (int i = 0; i < octaves; i++) {
+            total += noise(x * frequency, y * frequency, z * frequency) * amplitude;
+            maxValue += amplitude;
+            amplitude *= persistence;
+            frequency *= 2;
+        }
+        
+        return total / maxValue;
+    }
+};
+
+PerlinNoise perlin(42);
+
+void initializeWorld() {
+    const double scale = 0.05;
+    const int seaLevel = 20;
+    const int maxHeight = 40;
+    
+    for (int x = 0; x < WORLD_SIZE; x++) {
+        for (int z = 0; z < WORLD_SIZE; z++) {
+            double noiseValue = perlin.octaveNoise(x * scale, 0, z * scale, 4, 0.5);
+            noiseValue = (noiseValue + 1.0) / 2.0;
+            
+            int terrainHeight = seaLevel + (int)(noiseValue * (maxHeight - seaLevel));
+            
+            for (int y = 0; y < WORLD_SIZE; y++) {
+                if (y < terrainHeight - 5) {
+                    world[x][y][z] = BlockType::STONE;
+                } else if (y < terrainHeight - 1) {
+                    world[x][y][z] = BlockType::DIRT;
+                } else if (y < terrainHeight) {
+                    world[x][y][z] = BlockType::GRASS;
+                } else {
+                    world[x][y][z] = BlockType::AIR;
+                }
+            }
+        }
+    }
+}
+
+bool shouldRenderBlock(BlockType type) {
+    return type != BlockType::AIR;
+}
 
 // Simple shader class - all in one file
 class Shader {
@@ -127,7 +255,7 @@ private:
 const unsigned int SCR_WIDTH = 1200;
 const unsigned int SCR_HEIGHT = 800;
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(32.0f, 50.0f, 32.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -271,7 +399,10 @@ int main() {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
+    initializeWorld();
+    
     std::cout << "Game started! Use WASD to move, mouse to look around, ESC to exit." << std::endl;
+    std::cout << "Perlin noise terrain generated!" << std::endl;
 
     while (!glfwWindowShouldClose(window)) {
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -285,20 +416,28 @@ int main() {
 
         shader.use();
 
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), 
                                               (float)SCR_WIDTH / (float)SCR_HEIGHT, 
-                                              0.1f, 100.0f);
+                                              0.1f, 1000.0f);
 
-        shader.setMat4("model", model);
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
 
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        for (int x = 0; x < WORLD_SIZE; x++) {
+            for (int y = 0; y < WORLD_SIZE; y++) {
+                for (int z = 0; z < WORLD_SIZE; z++) {
+                    if (shouldRenderBlock(world[x][y][z])) {
+                        glm::mat4 model = glm::mat4(1.0f);
+                        model = glm::translate(model, glm::vec3(x, y, z));
+                        shader.setMat4("model", model);
+                        glDrawArrays(GL_TRIANGLES, 0, 36);
+                    }
+                }
+            }
+        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();
